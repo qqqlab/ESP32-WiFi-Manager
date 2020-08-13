@@ -24,12 +24,14 @@ bool wm_setup(String &ssid, String &pw, String portal_ssid, String portal_pw) {
   wm_ssid = ssid;
   wm_pw = pw;
   
-  //attempt to connect to network
+  //start wifi
+  WiFi.begin(wm_ssid.c_str(), wm_pw.c_str());
+  
+  //exit if connected
   if(wm_ssid=="") {
     Serial.println("No SSID stored, starting captive portal");
   } else{
-    Serial.print("Connecting to " + wm_ssid + " ");
-    WiFi.begin(wm_ssid.c_str(), wm_pw.c_str());
+    Serial.print("Connecting to " + wm_ssid + " ");  
     int timeout = WM_CONNECT_TIMEOUT;
     while (timeout && WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
