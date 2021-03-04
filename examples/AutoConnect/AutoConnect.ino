@@ -28,20 +28,24 @@ void setup() {
   //config.ssid = ""; config_save(); //remove ssid (for testing)
 
   //start WiFiManager
-  WiFiManager.portalSSID = "qqqlab";
-  WiFiManager.portalPassword = "12345678";
+  WiFiManager.portalSSID = "AutoConnect";
+  WiFiManager.portalPassword = "12345678"; 
   WiFiManager.begin(config.ssid, config.pw, WiFiManager_saveCredentials);
   //WiFiManager.waitConnected(); //wait for connection (optional)
 }
 
-void loop() {
-  static int cnt;
-  
+int interval = 1000;
+uint32_t interval_start = -interval;
+int cnt;
+
+void loop() {  
   WiFiManager.loop();
 
-  Serial.print("loop:");
-  Serial.println(++cnt); 
-  delay(1000); 
+  if(millis() - interval_start >  interval) {
+    interval_start = millis();
+    Serial.print("loop:");
+    Serial.println(++cnt); 
+  }
 }
 
 
