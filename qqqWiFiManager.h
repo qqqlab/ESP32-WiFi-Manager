@@ -29,9 +29,9 @@
 class WiFiManagerClass {
 public:
   //timeouts, set to 0 to disable
-  int connectingTimeout = 20;     //seconds to wait to establish wifi connection, before starting captive portal
-  int portalTimeout = 300;        //seconds to keep captive portal alive before rebooting and trying to reconnect to wifi
+  int connectingTimeout = 20;     //seconds to wait for initial wifi connection before starting captive portal
   int lostConnectionTimeout = 60; //seconds to wait for lost wifi to reconnect before starting captive portal
+  int portalTimeout = 300;        //seconds to keep captive portal alive before rebooting and trying to reconnect to wifi
 
   //wifi credentials
   String wifiSSID = "";
