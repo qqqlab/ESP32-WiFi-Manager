@@ -37,7 +37,7 @@ void WiFiManagerClass::begin(String wifiSSID, String wifiPassword, THandlerFunct
 
   if(wifiSSID == "") {
     Serial.println("WiFiManager.loop: can't connect, SSID not set");
-    _startPortal();
+    startPortal();
   }else{
     //start wifi
     Serial.println("WiFiManager.loop: Connecting to " + wifiSSID + " ");
@@ -59,7 +59,7 @@ WiFiManagerClass::StatusEnum WiFiManagerClass::loop() {
         Serial.println("WiFiManager.loop: Connected");
         _status = CONNECTED;
       }else if(connectingTimeout > 0 && millis() - _startConnectingMillis > (connectingTimeout * 1000)) {
-        _startPortal();
+        startPortal();
       }    
       break;
 
@@ -97,28 +97,31 @@ void WiFiManagerClass::waitConnected() {
 }
 
 //start captive portal
-void WiFiManagerClass::_startPortal() { 
+void WiFiManagerClass::startPortal(THandlerFunction notFoundHandler) { 
   Serial.println("Starting captive portal");
 
   //wifi 
   WiFi.persistent(false);
   WiFi.setAutoConnect(false);
   WiFi.mode(WIFI_AP);
-  delay(2000); //needed, otherwise crash on connect
+  //delay(2000); //needed, otherwise crash on connect in 1.0.4 - appears to work without this delay in 1.0.5
   WiFi.softAP(portalSSID.c_str(),portalPassword.c_str());
-  WiFi.softAPConfig(portalIP, portalIP, IPAddress(255, 255, 255, 0));
+  WiFi.softAPConfig(portalIP, portalIP, IPAddress(255, 255, 255, 0)); //1.0.5 does not always set WiFi.softAPIP() correctly, solved by using WiFi.softAPIP() for DNS
   Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
+  Serial.println(WiFi.softAPIP()); //sometimes this is not the IP set in WiFi.softAPConfig ...
   Serial.println("portal started");
 
-  //if DNSServer is started with "*" for domain name, it will reply with
-  //provided IP to all DNS request
+  //dns
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-  dnsServer.start(53, "*", portalIP);
+  dnsServer.start(53, "*", WiFi.softAPIP()); //"*" reply this IP to all queries
   Serial.println("DNS server started");
 
   //setup webserver
-  webServer.onNotFound(_handleNotFound);
+  if(notFoundHandler) {
+    webServer.onNotFound(notFoundHandler);
+  }else{
+    webServer.onNotFound(_handleNotFound);
+  }
   webServer.begin(80);
   Serial.println("webserver started");
   Serial.println("captive portal started");

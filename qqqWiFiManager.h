@@ -59,7 +59,8 @@ public:
   StatusEnum loop();
   StatusEnum status();
   void waitConnected();
-
+  void startPortal( THandlerFunction notFoundHandler = NULL);
+  
 protected:
   StatusEnum _status = CONNECTING;
   uint32_t _startPortalMillis;     //timestamp start portal
@@ -68,7 +69,7 @@ protected:
   
   THandlerFunction _saveHandler;
 
-  void _startPortal();
+
   static String _scan();
   static void _handleNotFound();
   void _reboot(String msg);
