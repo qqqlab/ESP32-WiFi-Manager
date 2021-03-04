@@ -4,9 +4,9 @@ A WiFi manager (Captive Portal) specifically for ESP32 in unreliable network env
 
 The following timeouts allow recovery from dropped/reappearing networks, whilst allowing the user to enter new wifi credentials if needed:
 
-- _connectingTimeout_ wait to establish initial wifi connection, on timeout start captive portal (default 20 seconds)
+- _connectingTimeout_ wait for initial wifi connection before starting captive portal (default 20 seconds)
 - _lostConnectionTimeout_ wait for lost wifi to reconnect before starting captive portal (default 60 seconds)
-- _portalTimeout_ time to keep unconnected captive portal alive before rebooting (default 300 seconds)
+- _portalTimeout_ time to keep captive portal alive before rebooting (default 300 seconds)
 
 Status cycle:
 
