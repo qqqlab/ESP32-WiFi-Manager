@@ -43,6 +43,9 @@ public:
   String portalSSID = "qqqlab";       
   String portalPassword = "12345678";
 
+  //portal design
+  String htmlTag = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/><style>input{padding:5px;font-size:1em;width:95%;} body{text-align:center;font-family:verdana;} button{border:0;border-radius:0.3rem;background-color:#1fa3ec;color:#fff;line-height:2.4rem;font-size:1.2rem;width:95%;}</style>";
+
   DNSServer dnsServer;
   WebServer webServer;
  

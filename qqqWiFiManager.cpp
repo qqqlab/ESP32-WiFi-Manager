@@ -131,8 +131,7 @@ void WiFiManagerClass::startPortal(THandlerFunction notFoundHandler) {
 }
 
 //list available wifi networks
-String WiFiManagerClass::_scan()
-{
+String WiFiManagerClass::_scan() {
   String s = "";
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();
@@ -143,10 +142,10 @@ String WiFiManagerClass::_scan()
       // Print SSID and RSSI for each network found
       s += "<button onclick=\"upd('" + WiFi.SSID(i) + "')\">" 
       //+ String(i + 1) + ": " 
-      + WiFi.SSID(i) + " (" 
-      + String(WiFi.RSSI(i)) + ")" 
-      + (WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? " " : "*") 
-      + "</button><br />";
+      + WiFi.SSID(i) + " [" 
+      + (WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? "open " : "") 
+      + String(WiFi.RSSI(i)) + "dB"
+      + "]</button><br />";
       delay(10);
     }
     s += "<script>function upd(s){document.getElementById('ssid').value=s;var pw=document.getElementById('pw');pw.value='';pw.focus();}</script>";
@@ -156,32 +155,35 @@ String WiFiManagerClass::_scan()
 
 //static webserver callback
 void WiFiManagerClass::_handleNotFound() {
-  //handle form data, reboot to start wifi
-  String ssid = WiFiManager.webServer.arg("ssid");
-  String pw = WiFiManager.webServer.arg("pw");
-  if(ssid!="") {
+  String ssid =   WiFiManager.webServer.arg("ssid");
+  String pw =     WiFiManager.webServer.arg("pw");
+  String action = WiFiManager.webServer.arg("a");
+
+  //process form data, reboot to start wifi
+  if(ssid != "") {
     WiFiManager.wifiSSID = ssid;
     WiFiManager.wifiPassword = pw;
     WiFiManager._saveHandler();
+    WiFiManager.webServer.send(200, "text/html", WiFiManager.htmlTag + "Settings Saved - Rebooting");
     WiFiManager._reboot("Stored new ssid="+ssid);
   }
+  
+  //process reboot request
+  if(action == "reboot") {
+    WiFiManager.webServer.send(200, "text/html", WiFiManager.htmlTag + "Reconnecting, please wait ...");
+    WiFiManager._reboot("Portal request");
+  } 
 
-  //send html form
-  String message;
-  message = "<html><body><form>Network<input id=\"ssid\" name=\"ssid\"><br />Password<input id=\"pw\" name=\"pw\" type=\"password\"><br /><input type=\"submit\" value=\"Save\"></form>" 
-  + _scan();
-  message += "URI: ";
-  message += WiFiManager.webServer.uri();
-  message += "\nMethod: ";
-  message += (WiFiManager.webServer.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += WiFiManager.webServer.args();
-  message += "\n";
-  for (uint8_t i = 0; i < WiFiManager.webServer.args(); i++) {
-    message += " " + WiFiManager.webServer.argName(i) + ": " + WiFiManager.webServer.arg(i) + "\n";
-  }
-  WiFiManager.webServer.send(200, "text/html", message);
+  //send web page
+  String m = WiFiManager.htmlTag;
+  if(WiFiManager.wifiSSID != "") m += "Current network is <b>" + WiFiManager.wifiSSID + "</b> - <a href=\"/?a=reboot\">Reconnect</a>";
+  m += "<h1>WiFi Setup</h1>";
+  m += "<form>Network<br /><input id=\"ssid\" name=\"ssid\"><br />Password<br /><input id=\"pw\" name=\"pw\" type=\"password\"><br /><button type=\"submit\">Save</button></form>";
+  m += "<h1>Available Networks</h1><a href=\"/\">Refresh</a><br />" + _scan();
+  m += "</body></html>";
+  WiFiManager.webServer.send(200, "text/html", m);
 }
+
 
 void WiFiManagerClass::_reboot(String msg) {
   Serial.println(msg + " --> rebooting...");
