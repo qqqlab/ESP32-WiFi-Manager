@@ -23,3 +23,4 @@ I tried many of the other options available, but got none of them to do exactly 
 - captive portal with single page to set wifi credentials
 - automatic fallback to captive portal when wifi connection drops
 - automatic reestablish connection
+- can be used as standalone portal
