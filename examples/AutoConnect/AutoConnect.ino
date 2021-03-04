@@ -20,7 +20,7 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
 
-  Serial.println("WiFiManager AutoConnect Demo");
+  Serial.println("WiFiManager Auto Connect Demo");
 
   //load config
   config_setup();
@@ -28,7 +28,7 @@ void setup() {
   //config.ssid = ""; config_save(); //remove ssid (for testing)
 
   //start WiFiManager
-  WiFiManager.portalSSID = "AutoConnect";
+  WiFiManager.portalSSID = "Auto Connect Demo";
   WiFiManager.portalPassword = "12345678"; 
   WiFiManager.begin(config.ssid, config.pw, WiFiManager_saveCredentials);
   //WiFiManager.waitConnected(); //wait for connection (optional)
